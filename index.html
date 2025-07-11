@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>🔥 Code Browser</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+  <style>
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #4b5563;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #1f2937;
+    }
+  </style>
+</head>
+<body class="bg-gray-900 text-gray-100 h-screen flex flex-col">
+
+  <header class="bg-gray-800 shadow p-4 flex items-center justify-between">
+    <h1 class="text-xl font-semibold select-none">🔥 Code Browser</h1>
+    <button id="refreshBtn" class="px-3 py-1 bg-blue-600 rounded hover:bg-blue-700 transition">Refresh</button>
+  </header>
+
+  <main class="flex flex-1 overflow-hidden">
+
+    <!-- Sidebar -->
+    <aside class="w-80 bg-gray-800 border-r border-gray-700 flex flex-col overflow-auto">
+      <nav id="breadcrumb" class="p-4 text-sm space-x-1 flex flex-wrap text-blue-400 select-none"></nav>
+      <ul id="fileList" class="flex-1 overflow-auto divide-y divide-gray-700"></ul>
+    </aside>
+
+    <!-- Code viewer -->
+    <section class="flex-1 bg-gray-900 p-6 overflow-auto">
+      <pre class="whitespace-pre-wrap break-words max-h-full rounded-md"><code id="fileContent" class="language-none"></code></pre>
+    </section>
+
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markdown.min.js"></script>
+
+  <script>
+    const fileList = document.getElementById('fileList');
+    const fileContent = document.getElementById('fileContent');
+    const breadcrumb = document.getElementById('breadcrumb');
+    const refreshBtn = document.getElementById('refreshBtn');
+
+    let currentPath = '';
+
+    function getLanguageClass(filename, mimeType) {
+      if (mimeType.startsWith('text/javascript') || filename.endsWith('.js')) return 'language-javascript';
+      if (mimeType.startsWith('application/json') || filename.endsWith('.json')) return 'language-json';
+      if (mimeType.startsWith('text/x-python') || filename.endsWith('.py')) return 'language-python';
+      if (filename.endsWith('.md')) return 'language-markdown';
+      return 'language-none';
+    }
+
+    function loadList(path) {
+      fetch('/api/list?path=' + encodeURIComponent(path))
+        .then(res => res.json())
+        .then(data => {
+          currentPath = path;
+          renderBreadcrumb();
+          fileContent.textContent = '';
+          fileContent.className = 'language-none';
+          fileList.innerHTML = '';
+
+          if (path) {
+            // Up directory button
+            const upPath = path.split('/').slice(0, -1).join('/');
+            const li = document.createElement('li');
+            li.className = 'px-4 py-2 cursor-pointer hover:bg-gray-700 flex items-center space-x-2 text-gray-400';
+            li.innerHTML = `
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M7 16l-4-4m0 0l4-4m-4 4h18" />
+              </svg>
+              <span>.. Parent Directory</span>
+            `;
+            li.onclick = () => loadList(upPath);
+            fileList.appendChild(li);
+          }
+
+          data.forEach(item => {
+            const li = document.createElement('li');
+            li.className = 'px-4 py-2 cursor-pointer hover:bg-gray-700 flex items-center space-x-2';
+            li.title = item.name;
+            li.innerHTML = `
+              ${item.isDir ? 
+                `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V7M3 7l3-3h12l3 3" />
+                </svg>` :
+                `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M7 7h10M7 11h10M7 15h7" />
+                </svg>`
+              }
+              <span class="truncate">${item.name}</span>
+            `;
+            li.onclick = () => {
+              if (item.isDir) {
+                loadList(path ? path + '/' + item.name : item.name);
+              } else {
+                loadFile(path ? path + '/' + item.name : item.name);
+              }
+            };
+            fileList.appendChild(li);
+          });
+        })
+        .catch(() => {
+          fileList.innerHTML = '<li class="p-4 text-red-500">Failed to load directory</li>';
+        });
+    }
+
+    function loadFile(path) {
+      fetch('/api/file?path=' + encodeURIComponent(path))
+        .then(res => res.json())
+        .then(data => {
+          fileContent.textContent = data.content;
+          fileContent.className = getLanguageClass(path, data.mime);
+          Prism.highlightElement(fileContent);
+          renderBreadcrumb(path);
+        })
+        .catch(() => {
+          fileContent.textContent = 'Failed to load file content.';
+          fileContent.className = 'language-none';
+        });
+    }
+
+    function renderBreadcrumb(filePath = currentPath) {
+      const parts = filePath.split('/').filter(Boolean);
+      breadcrumb.innerHTML = '';
+
+      // Root 'Home'
+      const rootSpan = document.createElement('span');
+      rootSpan.textContent = 'Home';
+      rootSpan.className = 'cursor-pointer hover:underline';
+      rootSpan.onclick = () => loadList('');
+      breadcrumb.appendChild(rootSpan);
+
+      parts.forEach((part, i) => {
+        breadcrumb.appendChild(document.createTextNode(' / '));
+        const span = document.createElement('span');
+        span.textContent = part;
+        span.className = 'cursor-pointer hover:underline';
+        const pathUpToHere = parts.slice(0, i + 1).join('/');
+        span.onclick = () => loadList(pathUpToHere);
+        breadcrumb.appendChild(span);
+      });
+    }
+
+    refreshBtn.onclick = () => loadList(currentPath);
+
+    // Initial load
+    loadList('');
+  </script>
+</body>
+</html>
