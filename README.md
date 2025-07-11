@@ -37,8 +37,8 @@ A simple, elegant, self-hosted web-based file explorer with syntax highlighting 
    ---
    docker run -d \
    --name code-browser \
-   -p 3000:3000 \
-   -v /path/to/your/code:/app/code \
+   -p 8080:8080 \
+   -v /path/to/your/code:/path/to/your/code \  <!-- both should reflect the same path, delete this line -->
    code-browser
 
    then - http://<ip>:3000
