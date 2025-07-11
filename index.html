@@ -57,13 +57,37 @@
 
     let currentPath = '';
 
-    function getLanguageClass(filename, mimeType) {
-      if (mimeType.startsWith('text/javascript') || filename.endsWith('.js')) return 'language-javascript';
-      if (mimeType.startsWith('application/json') || filename.endsWith('.json')) return 'language-json';
-      if (mimeType.startsWith('text/x-python') || filename.endsWith('.py')) return 'language-python';
-      if (filename.endsWith('.md')) return 'language-markdown';
-      return 'language-none';
-    }
+     function getLanguageClass(filename, mimeType) {
+     if (mimeType.startsWith('text/javascript') || filename.endsWith('.js')) return 'language-javascript';
+     if (mimeType.startsWith('application/json') || filename.endsWith('.json')) return 'language-json';
+     if (mimeType.startsWith('text/x-python') || filename.endsWith('.py')) return 'language-python';
+     if (mimeType.startsWith('text/html') || filename.endsWith('.html') || filename.endsWith('.htm')) return 'language-html';
+     if (mimeType.startsWith('text/css') || filename.endsWith('.css')) return 'language-css';
+     if (mimeType.startsWith('application/xml') || filename.endsWith('.xml')) return 'language-xml';
+     if (filename.endsWith('.md') || filename.endsWith('.markdown')) return 'language-markdown';
+     if (filename.endsWith('.ts')) return 'language-typescript';
+     if (filename.endsWith('.tsx')) return 'language-tsx';
+     if (filename.endsWith('.jsx')) return 'language-jsx';
+     if (filename.endsWith('.c')) return 'language-c';
+     if (filename.endsWith('.cpp') || filename.endsWith('.cc') || filename.endsWith('.cxx')) return 'language-cpp';
+     if (filename.endsWith('.cs')) return 'language-csharp';
+     if (filename.endsWith('.java')) return 'language-java';
+     if (filename.endsWith('.rb')) return 'language-ruby';
+     if (filename.endsWith('.php')) return 'language-php';
+     if (filename.endsWith('.go')) return 'language-go';
+     if (filename.endsWith('.rs')) return 'language-rust';
+     if (filename.endsWith('.sh') || filename.endsWith('.bash')) return 'language-bash';
+     if (filename.endsWith('.yml') || filename.endsWith('.yaml')) return 'language-yaml';
+     if (filename.endsWith('.sql')) return 'language-sql';
+     if (filename.endsWith('.swift')) return 'language-swift';
+     if (filename.endsWith('.kt') || filename.endsWith('.kts')) return 'language-kotlin';
+     if (filename.endsWith('.toml')) return 'language-toml';
+     if (filename.endsWith('.ini')) return 'language-ini';
+
+    return 'language-none';
+   }    
+
+
 
     function loadList(path) {
       fetch('/api/list?path=' + encodeURIComponent(path))
