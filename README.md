@@ -2,7 +2,7 @@
 
 A simple, elegant, self-hosted web-based file explorer with syntax highlighting — perfect for browsing and sharing your code directory.
 
-![screenshot](screenshot.png) <!-- Optional: Add your own screenshot -->
+![screenshot](codebrowser.png) <!-- Optional: Add your own screenshot -->
 
 ---
 
