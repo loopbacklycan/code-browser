@@ -43,3 +43,16 @@ A simple, elegant, self-hosted web-based file explorer with syntax highlighting 
 
    then - http://<ip>:3000
 
+## File Structure
+
+   ```bash
+   code-browser/
+   ├── public/
+   │   ├── css/
+   │   ├── js/
+   │   └── index.html
+   ├── server.js
+   ├── package.json
+   ├── Dockerfile
+
+
