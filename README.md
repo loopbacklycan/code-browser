@@ -41,7 +41,7 @@ A simple, elegant, self-hosted web-based file explorer with syntax highlighting 
    -v /path/to/your/code:/path/to/your/code \  <!-- both should reflect the same path, delete this line -->
    code-browser
 
-   then - http://<ip>:3000
+   then - http://<ip>:8080
 
 ## File Structure
 
