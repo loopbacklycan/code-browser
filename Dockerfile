@@ -1,11 +1,3 @@
-
----
-
-## ✅ 2. `Dockerfile`
-
-Here’s your clean and simple Dockerfile:
-
-```Dockerfile
 # Dockerfile for code-browser
 FROM node:18-slim
 
