@@ -6,4 +6,4 @@ RUN npm install
 
 EXPOSE 8080
 
-CMD ["node", "server.mjs"
+CMD ["node", "server.mjs"]
