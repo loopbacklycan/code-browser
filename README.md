@@ -21,7 +21,7 @@ A simple, elegant, self-hosted web-based file explorer with syntax highlighting 
 1. **Clone the repo:**
 
    ```bash
-   git clone https://github.com/0wardriver0/code-browser.git
+   git clone https://github.com/loopbacklycan/code-browser.git
    cd code-browser
    ---
    npm install
